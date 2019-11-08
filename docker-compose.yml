@@ -3,10 +3,10 @@ services:
   db:
     image: "postgres:10.3-alpine"
     restart: unless-stopped
-    container_name: minesweeper-db
+    container_name: recommendations-db
     environment:
-      - POSTGRES_USER=minesweeper
+      - POSTGRES_USER=recommendations
       - POSTGRES_PASSWORD=secret123
-      - POSTGRES_DB=minesweeper
+      - POSTGRES_DB=recommendations
     ports:
-      - "5432:5432"
+      - "5324:5432"
