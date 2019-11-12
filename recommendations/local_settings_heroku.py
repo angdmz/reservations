@@ -8,19 +8,18 @@ ALLOWED_HOSTS = ['*']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'recommendations',
-        'USER': 'recommendations',
-        'PASSWORD': 'secret123',
-        'HOST': '172.17.0.1',
-        'PORT': '5324',
+        'NAME': os.getenv('DBNAME', 'recommendations'),
+        'USER': os.getenv('DBUSER', 'recommendations'),
+        'PASSWORD': os.getenv('DBPASS', 'recommendations'),
+        'HOST': os.getenv('DBHOST', '127.0.0.1'),
+        'PORT': os.getenv('DBPORT', '3254'),
     }
 }
 
-LOG_ROOT = '/opt/project/'
-
+LOG_ROOT = os.getenv("LOG_ROOT", '/var/logs')
+SECRET_KEY = os.getenv("SECRET_KEY", 'sarlanga')
 FOURSQUARE_API_CLIENT_ID = os.getenv("FOURSQUARE_API_CLIENT_ID", '')
 FOURSQUARE_API_CLIENT_SECRET = os.getenv("FOURSQUARE_API_CLIENT_SECRET", '')
-
 
 LOGGING = {
     'version': 1,

@@ -91,8 +91,6 @@ DATABASES = {
     }
 }
 
-
-
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
 
@@ -130,6 +128,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+FOURSQUARE_API_ENDPOINT = 'https://api.foursquare.com/v2/venues/search'
+FOURSQUARE_API_VERSION = '20190709'
+FOURSQUARE_API_CLIENT_ID = ''
+FOURSQUARE_API_CLIENT_SECRET = ''
 
 try:
     from .local_settings import *
