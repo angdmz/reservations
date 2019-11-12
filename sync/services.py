@@ -3,9 +3,7 @@ import json
 import requests
 from django.conf import settings
 
-
-class EmptyCityNameException(Exception):
-    pass
+from sync.exceptions import EmptyCityNameException, InvalidParametersException, FourSquareApiException
 
 
 class HotelSearcher:
@@ -29,14 +27,6 @@ def generate_hotel_searcher():
                                          settings.FOURSQUARE_API_CLIENT_SECRET,
                                          settings.FOURSQUARE_API_VERSION)
     return HotelSearcher(api_consumer)
-
-
-class InvalidParametersException(Exception):
-    pass
-
-
-class FourSquareApiException(Exception):
-    pass
 
 
 class FourSquareApiConsumer:
@@ -71,7 +61,6 @@ class ReservationsConsumer:
 
     def __init__(self, endpoint_url,):
         self.endpoint_url = endpoint_url
-
 
     def get_recent_reservations(self):
         return []

@@ -3,19 +3,9 @@ from django.test import TestCase
 
 # Create your tests here.
 
-from sync.services import HotelSearcher, generate_hotel_searcher, EmptyCityNameException, FourSquareApiConsumer
-
-class VenueRepositoryRaisesExceptionMock:
-    def get_venues(self, near, intent, query):
-        raise EmptyCityNameException('some shit')
-
-class VenueRepositoryNotEmptyMock:
-    def get_venues(self, near, intent, query):
-        return {'response':{'venues':[34,345,46,76]}}
-
-class VenueRepositoryEmptyMock:
-    def get_venues(self, near, intent, query):
-        return {'response':{'venues':[]}}
+from sync.services import HotelSearcher, generate_hotel_searcher, FourSquareApiConsumer
+from sync.exceptions import EmptyCityNameException
+from sync.tests.mocks import VenueRepositoryRaisesExceptionMock, VenueRepositoryNotEmptyMock, VenueRepositoryEmptyMock
 
 
 class HotelSearcherTest(TestCase):
@@ -78,3 +68,11 @@ class HotelSearcherIntegrationTest(TestCase):
         searcher = generate_hotel_searcher()
         no_hotels = searcher.search_hotels_by_city("Non existent city")
         self.assertEqual([], no_hotels)
+
+
+class ReservationsUpdaterTest(TestCase):
+    def setUp(self) -> None:
+        pass
+
+    def test_update_reservations(self):
+        pass
