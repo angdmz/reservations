@@ -129,6 +129,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+RESERVATIONS_ENDPOINT = 'https://brubank-flights.herokuapp.com/flight-reservations'
+
 FOURSQUARE_API_ENDPOINT = 'https://api.foursquare.com/v2/venues/search'
 FOURSQUARE_API_VERSION = '20190709'
 FOURSQUARE_API_CLIENT_ID = ''

@@ -2,10 +2,11 @@ from django.conf import settings
 from django.test import TestCase
 
 # Create your tests here.
-
-from sync.services import HotelSearcher, generate_hotel_searcher, FourSquareApiConsumer
+from reservations.models import Reservation
+from sync.services import HotelSearcher, generate_hotel_searcher, FourSquareApiConsumer, generate_reservations_retriever, ReservationsUpdater, generate_reservations_updater
 from sync.exceptions import EmptyCityNameException
-from sync.tests.mocks import VenueRepositoryRaisesExceptionMock, VenueRepositoryNotEmptyMock, VenueRepositoryEmptyMock
+from sync.tests.mocks import VenueRepositoryRaisesExceptionMock, VenueRepositoryNotEmptyMock, VenueRepositoryEmptyMock, \
+    ReservationsRetrieveEmptyMock, ReservationsRetrieveNonEmptyMock
 
 
 class HotelSearcherTest(TestCase):
@@ -70,9 +71,50 @@ class HotelSearcherIntegrationTest(TestCase):
         self.assertEqual([], no_hotels)
 
 
-class ReservationsUpdaterTest(TestCase):
+class ReservationsRetrieverTest(TestCase):
     def setUp(self) -> None:
         pass
 
+    def test_retrieve_reservations(self):
+        retriever = generate_reservations_retriever()
+        reservations = retriever.retrieve_recent_reservations()
+        self.assertIsNotNone(reservations)
+
+    def test_retrieve_empty_reservations(self):
+        retriever = generate_reservations_retriever()
+        reservations = retriever.retrieve_recent_reservations()
+        self.assertEqual([], reservations)
+
+    def test_generate_new_retriever(self):
+        retriever = generate_reservations_retriever()
+        self.assertIsNotNone(retriever)
+
+
+class ReservationsUpdaterTest(TestCase):
+
+    def setUp(self):
+        self.reservations_manager = Reservation.objects
+
+    def test_generate_reservations_updater(self):
+        updater = generate_reservations_updater()
+        self.assertIsNotNone(updater)
+
     def test_update_reservations(self):
+        updater = ReservationsUpdater(ReservationsRetrieveNonEmptyMock())
+        updated, new_reservations =  updater.update_reservations()
+        self.assertTrue(updated)
+        self.assertNotEqual({}, new_reservations)
+        for new in new_reservations:
+            self.assertTrue(self.reservations_manager.exists_reservation_with_id(new.reservation_id))
+
+    def test_update_no_reservations(self):
+        updater = ReservationsUpdater(ReservationsRetrieveEmptyMock())
+        updated, new_reservations = updater.update_reservations()
+        self.assertFalse(updated)
+        self.assertEqual({}, new_reservations)
+
+
+class ReservationsUpdaterIntegrationTest(TestCase):
+
+    def test_(self):
         pass

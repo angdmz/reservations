@@ -1,3 +1,5 @@
+import collections
+
 from sync.exceptions import EmptyCityNameException
 
 
@@ -14,3 +16,16 @@ class VenueRepositoryNotEmptyMock:
 class VenueRepositoryEmptyMock:
     def get_venues(self, near, intent, query):
         return {'response':{'venues':[]}}
+
+
+class ReservationsRetrieveEmptyMock:
+    def retrieve_recent_reservations(self):
+        return []
+
+
+Reservation = collections.namedtuple('Reservation', 'date destination reservationId')
+
+
+class ReservationsRetrieveNonEmptyMock:
+    def retrieve_recent_reservations(self):
+        return [Reservation(reservationId="sdfjsdjfsd", date='2020-01-13T12:52:58.432488', destination='Mumbai, India')]

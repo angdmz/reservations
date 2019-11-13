@@ -3,7 +3,9 @@ import json
 import requests
 from django.conf import settings
 
+from reservations.models import Reservation
 from sync.exceptions import EmptyCityNameException, InvalidParametersException, FourSquareApiException
+from zones.models import Country
 
 
 class HotelSearcher:
@@ -56,16 +58,40 @@ class FourSquareApiConsumer:
 
         return decoded_response
 
-
-class ReservationsConsumer:
+    
+class ReservationsRetriever:
 
     def __init__(self, endpoint_url,):
         self.endpoint_url = endpoint_url
 
-    def get_recent_reservations(self):
+    def retrieve_recent_reservations(self):
         return []
 
-    
+
+def generate_reservations_retriever():
+    return ReservationsRetriever(settings.RESERVATIONS_ENDPOINT)
+
+
 class ReservationsUpdater:
-    def update_reservations(self, reservations):
-        pass
+
+    reservation_manager = Reservation.objects
+    destination_manager = Country.objects
+
+    def __init__(self, reservations_retriever):
+        self.reservations_retriever = reservations_retriever
+
+    def update_reservations(self):
+        recent_reservations = self.reservations_retriever.retrieve_recent_reservations()
+        obj_list = [
+            Reservation(
+                reservation_id=recent_reservations['reservation_id'],
+                destination = recent_reservations['destination'],
+                date = recent_reservations['date']
+            )
+        ]
+        created_objs = self.reservation_manager.bulk_reservations(obj_list)
+        return recent_reservations is not [], created_objs
+
+
+def generate_reservations_updater():
+    pass
