@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'hotels',
     'reservations',
     'reservations_admin',
+    'sync',
     'rest'
 ]
 

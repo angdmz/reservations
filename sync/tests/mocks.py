@@ -23,9 +23,9 @@ class ReservationsRetrieveEmptyMock:
         return []
 
 
-Reservation = collections.namedtuple('Reservation', 'date destination reservationId')
+Reservation = collections.namedtuple('Reservation', 'date destination reservation_id')
 
 
 class ReservationsRetrieveNonEmptyMock:
     def retrieve_recent_reservations(self):
-        return [Reservation(reservationId="sdfjsdjfsd", date='2020-01-13T12:52:58.432488', destination='Mumbai, India')]
+        return [Reservation(reservation_id="sdfjsdjfsd", date='2020-01-13T12:52:58.432488', destination='Mumbai, India')]
