@@ -94,4 +94,4 @@ class ReservationsUpdater:
 
 
 def generate_reservations_updater():
-    pass
+    return ReservationsUpdater(generate_reservations_retriever())
