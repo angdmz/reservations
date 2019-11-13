@@ -84,10 +84,11 @@ class ReservationsUpdater:
         recent_reservations = self.reservations_retriever.retrieve_recent_reservations()
         obj_list = [
             Reservation(
-                reservation_id=recent_reservations['reservation_id'],
-                destination = recent_reservations['destination'],
-                date = recent_reservations['date']
+                reservation_id=r['reservation_id'],
+                destination = r['destination'],
+                date = r['date']
             )
+            for r in recent_reservations
         ]
         created_objs = self.reservation_manager.bulk_reservations(obj_list)
         return recent_reservations is not [], created_objs
