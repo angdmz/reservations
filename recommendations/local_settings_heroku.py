@@ -1,7 +1,7 @@
 import os
 import sys
 
-DEBUG = True
+DEBUG = os.getenv('DJANGO_DEBUG', False)
 
 ALLOWED_HOSTS = ['*']
 
