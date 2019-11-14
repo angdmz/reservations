@@ -6,10 +6,10 @@ RUN apk add --no-cache git \
     libpq
 RUN mkdir -p /opt/project
 WORKDIR /opt/project
-ADD . /opt/project
-RUN mkdir logs/
-ENV PYTHONUNBUFFERED 1
+ADD requirements.txt /opt/project
 RUN pip install -U pip
 RUN pip install -r requirements.txt
-RUN cp recommendations/local_settings_docker.py recommendations/local_settings.py
-
+RUN pip install ipython
+RUN pip install coverage
+RUN pip install django-discover-runner
+ADD . /opt/project

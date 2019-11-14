@@ -49,27 +49,71 @@ Python 3.6.7 y virtual host
  ó
 Docker y Docker-compose
 
-### En Ubuntu
- 
+### Instalación
+#### En Ubuntu
+
  - Instalar drivers y pip
 ```
 sudo apt-get update
 sudo apt-get install python3-pip python3-dev libpq-dev postgresql postgresql-contrib
 ```
-Paso a paso y comandos:
+
  - clonar este repositorio
  - ir a la carpeta de la aplicación
  - crear un nuevo virtual env
  - activar virtual env
  - instalar requirements de pip
+ - crear local_settings.py en la carpeta /carpeta/del/proyecto/reservations/ usando uno de los local_settings_entornoadecuado.py
  - correr migraciones
- - cronear python manage.py update_reservations al tiempo deseado menor a 10 minutos
 ```
 git clone https://github.com/angdmz/reservations.git /carpeta/del/proyecto
 cd /carpeta/del/proyecto
 virtualenv -p python3 /carpeta/del/venv
 source /carpeta/del/venv/bin/activate
 pip install -U requirements.txt
+cp reservations/local_settings_entornoadecuado.py reservations/local_settings.py 
+python manage.py migrate
+```
+
+ - cronear python manage.py update_reservations a un tiempo deseado menor a 10 minutos
+ - correr el servidor local (desarrollo solamente)
+
+```
+python manage.py runserver 127.0.0.1:8000
+```
+
+### Docker
+#### Para desarrollo
+ - clonar este repositorio
+ - ir a la carpeta de la aplicación
+ - Buildear imagen
+ - Correr docker-compose
+ - crear local_settings.py en la carpeta /carpeta/del/proyecto/reservations/ usando uno de los local_settings_entornoadecuado.py
+ - correr migraciones
+ - iniciar servidor
+ - cronear comando de django
+
+```
+git clone https://github.com/angdmz/reservations.git /carpeta/del/proyecto
+cd /carpeta/del/proyecto
+docker build -t reservations:dev -f Dockerfile.dev .
+docker-compose -f Dockerfile.dev up &
+docker run -it -v $(pwd):/opt/project --rm --name migraciones reservations:dev python manage.py migrate
+docker run -d -v $(pwd):/opt/project --rm -p algunPuerto:8000 --name aplicacion reservations:dev python manage.py runserver 0.0.0.0:8000
+docker run -d -v $(pwd):/opt/project --rm --name update reservations:dev python manage.py update_reservations
+```
+
+#### Instalacion normal
+ - clonar este repositorio
+ - ir a la carpeta de la aplicación
+ - correr docker-compose
+ - crear archivo de nombre .env con variables SECRET_KEY y POSTGRES_PASSWORD usando template .envexample
+ - cronear la invocacion a container de upload_reservations
+```
+git clone https://github.com/angdmz/reservations.git /carpeta/del/proyecto
+cd /carpeta/del/proyecto
+docker-compose -d up
+docker exec recommendations-app python manage.py update_reservations
 ```
 
 ## Decisiones tomadas

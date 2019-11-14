@@ -1,7 +1,9 @@
 import os
 import sys
 
-DEBUG = os.getenv('DJANGO_DEBUG', True)
+SECRET_KEY = os.getenv('SECRET_KEY', 'secretito')
+
+DEBUG = os.getenv('DJANGO_DEBUG', False)
 
 ALLOWED_HOSTS = ['*']
 
@@ -10,9 +12,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'recommendations',
         'USER': 'recommendations',
-        'PASSWORD': 'secret123',
-        'HOST': '172.17.0.1',
-        'PORT': '5324',
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'secret123'),
+        'HOST': 'db',
+        'PORT': '5432',
     }
 }
 

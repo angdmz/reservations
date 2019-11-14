@@ -6,7 +6,42 @@ services:
     container_name: recommendations-db
     environment:
       - POSTGRES_USER=recommendations
-      - POSTGRES_PASSWORD=secret123
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=recommendations
+    expose:
+      - 5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+  app:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    image: reservations:prod
+    container_name: recommendations-app
+    command: gunicorn recommendations.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - static:/opt/project/static_cdn
+      - media:/opt/project/media_cdn
+    depends_on:
+      - migrations
     ports:
-      - "5324:5432"
+      - "1234:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=recommendations.settings
+      - SECRET_KEY=${SECRET_KEY}
+  migrations:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    depends_on:
+      - db
+    image: reservations:prod
+    container_name: recommendations-migrations
+    command: python manage.py migrate --noinput
+    environment:
+      - DJANGO_SETTINGS_MODULE=recommendations.settings
+      - SECRET_KEY=${SECRET_KEY}
+volumes:
+  pgdata:
+  media:
+  static:
