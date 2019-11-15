@@ -21,7 +21,7 @@ class HotelSearcher:
         if city_name == '':
             raise EmptyCityNameException('No city name given')
         try:
-            logger.info("Searchi")
+            logger.info("Searching cities")
             venues = self.venue_repository.get_venues(city_name, 'browse', 'hotels')
         except InvalidParametersException as ipe:
             return []
