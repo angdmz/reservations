@@ -83,6 +83,23 @@ python manage.py runserver 127.0.0.1:8000
 ```
 
 ### Docker
+#### Requisitos
+Docker instalado y docker-compose instalado
+
+#### Deploy
+ - clonar este repositorio
+ - ir a la carpeta de la aplicación
+ - correr docker-compose
+ - crear archivo de nombre .env con variables SECRET_KEY y POSTGRES_PASSWORD usando template .envexample
+ - cronear la invocacion a container de upload_reservations
+```
+git clone https://github.com/angdmz/reservations.git /carpeta/del/proyecto
+cd /carpeta/del/proyecto
+docker-compose -d up
+docker exec recommendations-app python manage.py update_reservations
+```
+
+
 #### Para desarrollo
  - clonar este repositorio
  - ir a la carpeta de la aplicación
@@ -103,18 +120,14 @@ docker run -d -v $(pwd):/opt/project --rm -p algunPuerto:8000 --name aplicacion 
 docker run -d -v $(pwd):/opt/project --rm --name update reservations:dev python manage.py update_reservations
 ```
 
-#### Instalacion normal
- - clonar este repositorio
- - ir a la carpeta de la aplicación
- - correr docker-compose
- - crear archivo de nombre .env con variables SECRET_KEY y POSTGRES_PASSWORD usando template .envexample
- - cronear la invocacion a container de upload_reservations
-```
-git clone https://github.com/angdmz/reservations.git /carpeta/del/proyecto
-cd /carpeta/del/proyecto
-docker-compose -d up
-docker exec recommendations-app python manage.py update_reservations
-```
+## API Docs
+
+- GET /recommendations
+    -  destination -> str : required. Es el nombre de una ciudad o pais, es *case insensitive* 
+    
+    Devuelve diccionario con clave *results* que a su vez su significado es otro diccionario con claves *hotels* y *reservations*, que tienen los hoteles y las reservaciones ordenadas por fecha respectivamente
+    
+La documentación de la API se puede ver en Swagger también, endpont /v1/docs
 
 ## Decisiones tomadas
 
@@ -126,3 +139,8 @@ La idea para encarar el problema es desarrollar primero una API que exponga el s
 
 Este cron, que ejecutará el comando Django upload_reservations, traerá todas las reservaciones, y en el momento también buscará los hoteles de las locaciones de cada una, entonces en el momento de consumir la API, no se dependerá de ningún servicio externo y el overhead único será sobre la DB de la aplicación
 
+## Mejores a la aplicacion
+
+Ahora, la aplicacion usa como persistencia Postgres, y las busquedas de las ciudades y paises se hace con %, lo cual puede ser ineficiente a largo plazo, deberia cambiarse por ElasticSearch
+
+Si se pudiera modificar el sistema de reservas, haria que exponga un servicio para buscar reservaciones por destino, al igual que funciona esta API. Asi no tendria que tener un cron o daemon que levante las reservaciones nuevas regularmente, y se pueden obtener de forma lazy y cachearse normalmente
