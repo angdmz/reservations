@@ -136,11 +136,16 @@ La aplicación está desarrollada sobre Python 3.6.7 y Django 2.2.6, Python porq
 La idea para encarar el problema es desarrollar primero una API que exponga el servicio que se pide,
  y un daemon o cron que cada cierto tiempo traiga las nuevas reservaciones y las persista en DB, esto fue decidido así 
  en lugar de lazy loading porque como las reservaciones se limpian regularmente, en caso de que no se invoque el servicio durante ese tiempo entonces queda una inconsistencia entre los datos a exponer.
+ Además en este comando, para cada destino de cada reservacion, se buscan hoteles y se los persiste en DB también, esto se hace así porque es más fácil hacer búsquedas sobre DB que una cache tipo clave=>valor si no tengo la clave exacta, que es el caso de buscar destinos sin usar el término standarizado
 
 Este cron, que ejecutará el comando Django upload_reservations, traerá todas las reservaciones, y en el momento también buscará los hoteles de las locaciones de cada una, entonces en el momento de consumir la API, no se dependerá de ningún servicio externo y el overhead único será sobre la DB de la aplicación
 
+
+
 ## Mejores a la aplicacion
 
-Ahora, la aplicacion usa como persistencia Postgres, y las busquedas de las ciudades y paises se hace con %, lo cual puede ser ineficiente a largo plazo, deberia cambiarse por ElasticSearch
+Ahora, la aplicacion usa como persistencia Postgres, y las busquedas de las ciudades y paises se hace con %, lo cual puede ser ineficiente a largo plazo, deberia cambiarse por ElasticSearch que es mejor para búsqueda de texto
+
+El comando que actualiza las reservaciones en la aplicación debería buscar los hoteles de forma asincrónica para tardar menos en la ejecución
 
 Si se pudiera modificar el sistema de reservas, haria que exponga un servicio para buscar reservaciones por destino, al igual que funciona esta API. Asi no tendria que tener un cron o daemon que levante las reservaciones nuevas regularmente, y se pueden obtener de forma lazy y cachearse normalmente
