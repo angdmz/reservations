@@ -52,13 +52,17 @@ class FourSquareApiConsumer:
                   'client_id': self.client_id,
                   'client_secret': self.client_secret,
                   'v': self.version}
+        logger.debug("Requesting to {} with params {}".format(str(self.endpoint_url), str(params)))
         res = requests.get(self.endpoint_url, params)
+
         decoded_response = json.loads(res.content.decode())
         if 0 <= res.status_code - 400 <= 12:
             raise InvalidParametersException('Client side error, status code: {} ; error detail: {}'
                                              .format(str(res.status_code),
                                                      str(decoded_response['meta']['errorDetail'])))
         if 0 <= res.status_code - 500 <= 12:
+            logger.error("Request to {} with params {} responded server side error with {}, message: {}"
+                         .format(str(self.endpoint_url), str(params), str(res.status_code), str(decoded_response['meta']['errorDetail'])))
             raise FourSquareApiException(decoded_response['meta']['errorDetail'])
 
         return decoded_response
@@ -100,6 +104,7 @@ class ReservationsUpdater:
         self.reservations_retriever = reservations_retriever
 
     def update_reservations(self):
+        logger.info("Starting update reservations")
         recent_reservations = self.reservations_retriever.retrieve_recent_reservations()
         dest_list = [
             Destination(place=r.destination)
@@ -112,6 +117,7 @@ class ReservationsUpdater:
             for r in recent_reservations
         ]
         created_objs = self.reservation_manager.bulk_reservations(reservations_list)
+        logger.info("Update process finished")
         return len(recent_reservations) is not 0, created_objs
 
 
@@ -129,8 +135,9 @@ class HotelLoader:
 
     def load_hotels_for_destinations(self, destinations):
         hotels = []
-
+        logger.info("Loading hotels for {} destinations given".format(len(destinations)))
         for destination in destinations:
+            logger.debug("Loading destination {}".format(str(destination)))
             hotels_search_result = self.hotel_searcher.search_hotels_by_city(destination.place)
             hotels_for_place = \
                 [
@@ -139,6 +146,8 @@ class HotelLoader:
                     for hotel in hotels_search_result
                 ]
             hotels.extend(hotels_for_place)
+        logger.debug("Bulking hotels")
+        logger.info("Loading finished")
         return self.hotel_manager.bulk_create(hotels, ignore_conflicts=True)
 
 
